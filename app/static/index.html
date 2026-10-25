@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kestrel claim review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F3F5F6; --sheet: #FFFFFF; --ink: #14283D; --muted: #5A6B7B; --rule: #D3DAE0;
+    --review: #B23A2B; --pay: #2F6B4F; --field: #F8FAFB; --focus: #2E6FB0;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #0F1A24; --sheet: #172532; --ink: #E4EBF1; --muted: #9AABBA; --rule: #2C3E4E;
+      --review: #F07A63; --pay: #6FC39A; --field: #1D2E3D; --focus: #7FB4E8;
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink);
+         font: 16px/1.5 "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1080px; margin: 0 auto; padding: 32px 20px 48px; }
+  header h1 { font-size: 1.6rem; font-weight: 800; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header p { margin: 0 0 24px; color: var(--muted); max-width: 64ch; }
+  .grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  @media (max-width: 820px) { .grid { grid-template-columns: 1fr; } }
+  .sheet { background: var(--sheet); border: 1px solid var(--rule); border-radius: 6px; padding: 20px; }
+  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 14px; }
+  .wide { grid-column: 1 / -1; }
+  label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; }
+  input, select { width: 100%; padding: 8px 10px; font: inherit; color: var(--ink);
+                  background: var(--field); border: 1px solid var(--rule); border-radius: 4px; }
+  input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+  button { font: inherit; font-weight: 600; padding: 9px 16px; border-radius: 4px; cursor: pointer;
+           border: 1px solid var(--rule); background: var(--field); color: var(--ink); }
+  button.primary { background: var(--ink); color: var(--sheet); border-color: var(--ink); }
+  .examples { font-size: 0.9rem; color: var(--muted); margin-top: 14px; }
+  .examples button { padding: 4px 10px; font-size: 0.85rem; margin: 4px 6px 0 0; }
+
+  .verdict { min-height: 320px; }
+  .empty { color: var(--muted); }
+  .stamp { display: inline-block; font-weight: 800; font-size: 3rem; line-height: 1; letter-spacing: 0.02em;
+           padding: 8px 18px 10px; border: 4px solid currentColor; border-radius: 8px; transform: rotate(-4deg);
+           margin: 6px 0 18px 6px; }
+  .stamp.review { color: var(--review); }
+  .stamp.pay { color: var(--pay); }
+  @media (prefers-reduced-motion: no-preference) {
+    .stamp { animation: press 220ms ease-out; }
+    @keyframes press { from { transform: rotate(-4deg) scale(1.25); opacity: 0; } to { transform: rotate(-4deg) scale(1); opacity: 1; } }
+  }
+  .summary { font-size: 1.05rem; margin: 0 0 14px; }
+  .numbers { display: flex; gap: 28px; margin: 0 0 16px; }
+  .numbers div span { display: block; font-size: 0.82rem; color: var(--muted); }
+  .numbers div strong { font-size: 1.35rem; }
+  h2 { font-size: 0.95rem; margin: 16px 0 6px; }
+  ol { margin: 0; padding-left: 20px; }
+  ol li { margin-bottom: 6px; }
+  .note { font-size: 0.9rem; color: var(--muted); border-left: 3px solid var(--rule); padding-left: 10px; margin-top: 12px; }
+  .error { color: var(--review); font-weight: 600; }
+  footer { margin-top: 24px; font-size: 0.85rem; color: var(--muted); max-width: 72ch; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Kestrel claim review</h1>
+    <p>Enter a warranty claim before payout. You get the chance it is fraudulent, whether a review is worth the
+       investigation desk's time in rupees, and the reasons behind it.</p>
+  </header>
+
+  <div class="grid">
+    <form class="sheet" id="claim" novalidate>
+      <div class="fields">
+        <div><label for="claim_id">Claim number</label><input id="claim_id" placeholder="WC711946"></div>
+        <div><label for="submitted_at">Submitted (IST)</label><input id="submitted_at" placeholder="2026-07-24 19:38"></div>
+        <div><label for="partner_id">Service partner</label><input id="partner_id" required placeholder="SP3129"></div>
+        <div><label for="sku">Product SKU</label><input id="sku" required placeholder="KH-CF-03"></div>
+        <div><label for="claim_amount_inr">Claim amount (Rs)</label><input id="claim_amount_inr" type="number" min="1" required></div>
+        <div><label for="days_since_purchase">Days since purchase</label><input id="days_since_purchase" type="number" min="0" required></div>
+        <div><label for="photo_attached">Photo attached</label>
+          <select id="photo_attached"><option>Y</option><option>N</option></select></div>
+        <div><label for="partner_inspected">Inspection sign-off</label>
+          <select id="partner_inspected"><option>N</option><option>Y</option></select></div>
+        <div><label for="customer_prior_claims">Customer's earlier claims</label><input id="customer_prior_claims" type="number" min="0" value="0"></div>
+        <div><label for="product_serial">Serial</label><input id="product_serial"></div>
+        <div class="wide"><label for="claim_description">Fault description</label><input id="claim_description"></div>
+        <div class="wide"><label for="inspector_note">Inspector's note (blank if not inspected)</label><input id="inspector_note"></div>
+      </div>
+      <div class="actions">
+        <button class="primary" type="submit">Check claim</button>
+        <button type="reset">Clear</button>
+      </div>
+      <div class="examples">Try a recent claim:
+        <button type="button" data-ex="0">Small claim, flagged outlet</button>
+        <button type="button" data-ex="1">Routine inspected claim</button>
+        <button type="button" data-ex="2">Large claim, no inspection</button>
+      </div>
+    </form>
+
+    <section class="sheet verdict" id="verdict" aria-live="polite">
+      <p class="empty">The decision appears here after you check a claim.</p>
+    </section>
+  </div>
+
+  <footer>
+    Scores come from a model trained on investigated claims from Apr 2025 to Jun 2026. "Review" means the expected fraud
+    stopped is larger than the Rs 380 goodwill cost of holding a genuine customer plus the Rs 260 cost of the review
+    (ops policy §4). The desk can take 40 a month; in testing, 9 to 15 claims a month cleared that bar.
+    <span id="asof"></span>
+  </footer>
+</main>
+
+<script>
+const EXAMPLES = [
+  {claim_id:"WC711946", submitted_at:"2026-07-24 19:38", partner_id:"SP3129", sku:"KH-CF-03", claim_amount_inr:1995,
+   days_since_purchase:12, photo_attached:"Y", partner_inspected:"N", customer_prior_claims:0,
+   product_serial:"KH-890290613", claim_description:"unit not heating", inspector_note:""},
+  {claim_id:"WC713152", submitted_at:"2026-09-11 20:19", partner_id:"SP3201", sku:"KH-WP-01", claim_amount_inr:4225,
+   days_since_purchase:253, photo_attached:"Y", partner_inspected:"Y", customer_prior_claims:1,
+   product_serial:"kh467467899", claim_description:"display not working", inspector_note:"Unit inspected, fault confirmed"},
+  {claim_id:"EXAMPLE-3", submitted_at:"2026-09-20 11:00", partner_id:"SP3103", sku:"KH-RV-02", claim_amount_inr:12994,
+   days_since_purchase:180, photo_attached:"N", partner_inspected:"N", customer_prior_claims:2,
+   product_serial:"KH101122950", claim_description:"motor not running", inspector_note:""},
+];
+const form = document.getElementById("claim"), out = document.getElementById("verdict");
+const NUM = ["claim_amount_inr", "days_since_purchase", "customer_prior_claims"];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+document.querySelectorAll("[data-ex]").forEach(b => b.onclick = () => {
+  const ex = EXAMPLES[b.dataset.ex];
+  for (const [k, v] of Object.entries(ex)) document.getElementById(k).value = v;
+  form.requestSubmit();
+});
+
+form.onreset = () => { out.innerHTML = '<p class="empty">The decision appears here after you check a claim.</p>'; };
+
+form.onsubmit = async e => {
+  e.preventDefault();
+  const body = {};
+  form.querySelectorAll("input, select").forEach(el => {
+    const v = el.value.trim();
+    if (v === "") return;
+    body[el.id] = NUM.includes(el.id) ? Number(v) : v;
+  });
+  const missing = ["partner_id", "sku", "claim_amount_inr", "days_since_purchase"].filter(k => !(k in body));
+  if (missing.length) {
+    out.innerHTML = `<p class="error">Fill in: ${missing.map(m => document.querySelector(`label[for=${m}]`).textContent).join(", ")}.</p>`;
+    return;
+  }
+  out.innerHTML = '<p class="empty">Checking…</p>';
+  try {
+    const r = await fetch("/score", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)});
+    const j = await r.json();
+    if (!r.ok) {
+      const msg = typeof j.detail === "string" ? j.detail
+        : (j.detail || []).map(d => `${d.loc.slice(-1)[0]}: ${d.msg}`).join("; ");
+      out.innerHTML = `<p class="error">The claim could not be scored. ${esc(msg)}</p>`;
+      return;
+    }
+    const review = j.decision === "review";
+    const pct = j.fraud_probability < 0.01 ? "under 1%" : Math.round(j.fraud_probability * 100) + "%";
+    out.innerHTML = `
+      <div class="stamp ${j.decision}">${review ? "Review" : "Pay"}</div>
+      <p class="summary">${esc(j.summary)}</p>
+      <div class="numbers">
+        <div><span>Chance of fraud</span><strong>${pct}</strong></div>
+        <div><span>Value of reviewing</span><strong>Rs ${j.expected_saving_rs.toLocaleString("en-IN")}</strong></div>
+      </div>
+      ${j.reasons.length ? `<h2>Why</h2><ol>${j.reasons.map(x => `<li>${esc(x.reason)}</li>`).join("")}</ol>`
+                         : `<h2>Why</h2><p>Nothing about this claim or partner stands out from normal claims.</p>`}
+      ${j.notes.map(n => `<p class="note">${esc(n)}</p>`).join("")}`;
+    document.getElementById("asof").textContent = `Partner history as of ${j.partner_data_as_of}.`;
+  } catch (err) {
+    out.innerHTML = '<p class="error">The scoring service is not responding. Start it with "uvicorn app.main:app" and try again.</p>';
+  }
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+# Client data and anything derived row-by-row from it stays out of the public repo (ops-policy §10).
+data/*.csv
+artifacts/
+reports/errors.csv
+reports/review_queue_*.csv
+reports/train_log.txt
+__pycache__/
+.venv/
